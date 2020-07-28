@@ -1,7 +1,8 @@
 // スプレッドシートに情報を記載しておき,そこから読み込む。
-const SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('シート1');
-const LINE_URL = SHEET.getRange(1, 1, 1, 1).getValues();// スプレッドシートから値を取得
-const LINE_TOKEN = SHEET.getRange(2, 1, 1, 1).getValues();// スプレッドシートから値を取得
+const UPDATE_INFO_SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('更新情報');
+const SYSTEM_INFO_SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('システム情報');
+const LINE_URL = SYSTEM_INFO_SHEET.getRange(1, 1, 1, 1).getValues();// スプレッドシートから値を取得
+const LINE_TOKEN = SYSTEM_INFO_SHEET.getRange(2, 1, 1, 1).getValues();// スプレッドシートから値を取得
 
 function doPost(e) {
   // 入力処理
@@ -17,23 +18,37 @@ function doPost(e) {
   // メイン処理
   let replyMessage;// 返信内容は変わるため、let
   //let lastDeadTime = Number(SHEET.getRange(SHEET.getLastRow(), 1, 1, 1).getValues());
-  let lastDeadTime = Number(SHEET.getRange(SHEET.getLastRow(), 3, 1, 1).getValues());
+  let lastDeadTime = Number(UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).getValues());
   switch (cmd) {
     case '残り時間':
       replyMessage = [`残り時間は${lastDeadTime}分です`];
       break;
     case '更新':
       const spentTime = Number(arg2);// 数字じゃないものだとUndefined
-      const now = getNow();
-      SHEET.getRange(SHEET.getLastRow() + 1, 1, 1, 1).setValue(arg1);// 更新内容
-      SHEET.getRange(SHEET.getLastRow(), 2, 1, 1).setValue(arg2);// 更新時間 +300, -60など
-      SHEET.getRange(SHEET.getLastRow(), 4, 1, 1).setValue(getNow());// 更新時刻
+      const now = getNow();// 更新日時
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow() + 1, 1, 1, 1).setValue(arg1);// 更新内容
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 2, 1, 1).setValue(arg2);// 更新時間 +300, -60など
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).setValue(getNow());// 更新時刻
       let thisDeadTime = lastDeadTime + spentTime;
-      SHEET.getRange(SHEET.getLastRow(), 3, 1, 1).setValue(thisDeadTime);// 残り時間をスプレッドシートに記入する
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(thisDeadTime);// 残り時間をスプレッドシートに記入する
       replyMessage = [`${now}\n『残り時間』が更新されました\n\n${lastDeadTime}分    更新前の残り時間\n${spentTime}分    ${arg1}したので\n${thisDeadTime}分    残り時間`];
       break;
     case '確認':
-      SHEET.getRange(SHEET.getLastRow(), 5, 1, 1).setValue('✔');// 確認（✔）
+      //SHEET.getRange(SHEET.getLastRow(), 5, 1, 1).setValue('✔');// 確認（✔）
+      let lastRow = UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow());
+      console.log(lastRow);
+      while (lastRow <= 5) {
+        // // 「更新日時」が記入してある最終行と同じ行の列「確認」に「✔」が入っていなければ「✔」を記入する
+        if (UPDATE_INFO_SHEET.getRange(lastRow, 4, 1, 1).setValue() != '' && UPDATE_INFO_SHEET.getRange(lastRow, 5, 1, 1).setValue() == '') {
+          UPDATE_INFO_SHEET.getRange(lastRow, 5, 1, 1).setValue() = '✔'
+        } else {
+          break;
+        }
+        lastRow--;
+      }
+      //if (SHEET.getRange(SHEET.getLastRow() - 1, 5, 1, 1).setValue('✔') == '') {
+        //SHEET.getRange(SHEET.getLastRow() - 1, 5, 1, 1).setValue('✔');
+      //}
     default:
       break;
   }
