@@ -34,12 +34,18 @@ function doPost(e) {
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(thisDeadTime);// 残り時間をスプレッドシートに記入する
       replyMessage = [`${now}\n『残り時間』が更新されました\n\n${lastDeadTime}分    更新前の残り時間\n${spentTime}分    ${arg1}したので\n${thisDeadTime}分    残り時間`];
       break;
-      
+    
     case '確認':
+      replyMessage = ['https://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0\n\n更新内容が正しければ\n「確認OK」と入力してください'];
+      break;
+      
+    case '確認OK':
         // 「更新日時」が記入してある最終行と同じ行の列に「✔」を記入する
         if (UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).getValues()) {
-          UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue('✔')
+          UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue(getNow())
         }
+      replyMessage = ['ご確認いただき、ありがとうございました！'];
+      break;
       
     default:
       break;
