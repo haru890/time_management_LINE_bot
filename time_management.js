@@ -14,6 +14,7 @@ function doPost(e) {
   const cmd = userMessage.split(' ')[0];// 残り時間 or 更新
   const arg1 = userMessage.split(' ')[1];// 更新内容
   const arg2 = userMessage.split(' ')[2];// 時間
+  let schedule = UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 6, 1, 1).getValues();
   
   // メイン処理
   let replyMessage;// 返信内容は変わるため、let
@@ -32,7 +33,7 @@ function doPost(e) {
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).setValue(getNow());// 更新時刻
       let thisDeadTime = lastDeadTime + spentTime;
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(thisDeadTime);// 残り時間をスプレッドシートに記入する
-      replyMessage = [`${now}\n『残り時間』が更新されました\n\n${lastDeadTime}分    更新前の残り時間\n${spentTime}分    ${arg1}したので\n${thisDeadTime}分    残り時間`];
+      replyMessage = [`${now}\n『残り時間』が更新されました\n\n${lastDeadTime}分    更新前の残り時間\n${spentTime}分    ${arg1}したので\n${thisDeadTime}分    残り時間\n\n詳細を確認↓\nhttps://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0`];
       break;
     
     case '確認':
@@ -45,6 +46,10 @@ function doPost(e) {
           UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue(getNow())
         }
       replyMessage = ['ご確認いただき、ありがとうございました！'];
+      break;
+      
+    case '予定':
+      replyMessage = [`次回の予定は\n${schedule}\n`];
       break;
       
     default:
