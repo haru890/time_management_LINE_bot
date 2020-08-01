@@ -11,29 +11,33 @@ function doPost(e) {
   const userMessage = json.events[0].message.text;
   
   // 半角スペースでスプリット
-  const cmd = userMessage.split(' ')[0];// 残り時間 or 更新
-  const arg1 = userMessage.split(' ')[1];// 更新内容
-  const arg2 = userMessage.split(' ')[2];// 時間
-  let schedule = UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 6, 1, 1).getValues();
+  const cmd = userMessage.split(' ')[0];// 残り時間 or 更新 or 確認
+  const arg1 = userMessage.split(' ')[1];// 更新内容　→更新（分）
+  const arg2 = userMessage.split(' ')[2];// 時間　→備考空白も許容したい
+  // 予定はなくす
+  //let schedule = UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 6, 1, 1).getValues();
   
   // メイン処理
   let replyMessage;// 返信内容は変わるため、let
-  //let lastDeadTime = Number(SHEET.getRange(SHEET.getLastRow(), 1, 1, 1).getValues());
-  let lastDeadTime = Number(UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).getValues());
+  //　残り（分）
+  let remainingTime = Number(UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).getValues());
   switch (cmd) {
     case '残り時間':
-      replyMessage = [`残り時間は${lastDeadTime}分です`];
+      replyMessage = [`残り時間は${remainingTime}分です`];
       break;
       
     case '更新':
-      const spentTime = Number(arg2);// 数字じゃないものだとUndefined
-      const now = getNow();// 更新日時
-      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow() + 1, 1, 1, 1).setValue(arg1);// 更新内容
-      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 2, 1, 1).setValue(arg2);// 更新時間 +300, -60など
-      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).setValue(getNow());// 更新時刻
-      let thisDeadTime = lastDeadTime + spentTime;
-      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(thisDeadTime);// 残り時間をスプレッドシートに記入する
-      replyMessage = [`${now}\n『残り時間』が更新されました\n\n${lastDeadTime}分    更新前の残り時間\n${spentTime}分    ${arg1}したので\n${thisDeadTime}分    残り時間\n\n詳細を確認↓\nhttps://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0`];
+      //const updateDate = getUpdateDate();// 更新日時
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow() + 1, 2, 1, 1).setValue(getUpdateDate());// 日付
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(arg1);// 更新（分）
+      let updateTime = Number(arg1);
+      let lastRemainingTime = remainingTime + updateTime;
+      if (updateTime > 0) {
+        updateTime = `+${updateTime}`;
+      }
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).setValue(lastRemainingTime);// 残り（分）
+      UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue(arg2);// 備考
+      replyMessage = [`更新 ${updateTime}(分) されました\n残り ${lastRemainingTime}(分) です`];
       break;
     
     case '確認':
@@ -42,14 +46,10 @@ function doPost(e) {
       
     case '確認OK':
         // 「更新日時」が記入してある最終行と同じ行の列に「✔」を記入する
-        if (UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).getValues()) {
-          UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue(getNow())
+        if (UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 2, 1, 1).getValues()) {
+          UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 1, 1, 1).setValue(getUpdateDate())
         }
       replyMessage = ['ご確認いただき、ありがとうございました！'];
-      break;
-      
-    case '予定':
-      replyMessage = [`次回の予定は\n${schedule}\n`];
       break;
       
     default:
@@ -80,17 +80,13 @@ function reply(replyMessage, replyToken) {
   return;
 }
 
-function getNow() {
+function getUpdateDate() {
   const youbi = ['日', '月', '火', '水', '木', '金', '土'];
-  const now = new Date();
-  const formattedNow = (
-    now.getFullYear() + '年' + 
-    (now.getMonth() + 1)  + '月' + 
-	now.getDate() + '日' + 
-    ` (${youbi[now.getDay()]}) ` +
-    ('00' + now.getHours()).slice(-2) + ':' + 
-    ('00' + now.getMinutes()).slice(-2) + ':' + 
-    ('00' + now.getSeconds()).slice(-2) 
+  const UpdateDate = new Date();
+  const formattedUpdateDate = ( 
+    (UpdateDate.getMonth() + 1)  + '/' + 
+	UpdateDate.getDate() + 
+    ` ${youbi[UpdateDate.getDay()]} ` 
   );
-  return formattedNow;
+  return formattedUpdateDate;
 }
