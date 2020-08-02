@@ -30,8 +30,9 @@ function doPost(e) {
       //const updateDate = getUpdateDate();// 更新日時
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow() + 1, 2, 1, 1).setValue(getUpdateDate());// 日付
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 3, 1, 1).setValue(arg1);// 更新（分）
+      //UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getRange(getLastRow(), 1, 1, 1).getLastRow(), 3, 1, 1).setValue(arg1);// 更新（分）
       let updateTime = Number(arg1);
-      let lastRemainingTime = remainingTime + updateTime;
+      let lastRemainingTime = remainingTime + updateTime; // constでいいかも？
       if (updateTime > 0) {
         updateTime = `+${updateTime}`;
       }
@@ -40,15 +41,19 @@ function doPost(e) {
       replyMessage = [`更新 ${updateTime}(分) されました\n残り ${lastRemainingTime}(分) です`];
       break;
     
-    case '確認':
-      replyMessage = ['https://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0\n\n更新内容が正しければ\n「確認OK」と入力してください'];
+    case 'リンク':
+      replyMessage = ['https://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0'];
       break;
       
-    case '確認OK':
-        // 「更新日時」が記入してある最終行と同じ行の列に「✔」を記入する
-        if (UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 2, 1, 1).getValues()) {
-          UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 1, 1, 1).setValue(getUpdateDate())
-        }
+    case '承認':
+        // 最終行に「✔」を記入する
+      //UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 1, 1, 1)
+      
+      const lastRowOfColumnA = UPDATE_INFO_SHEET.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
+      UPDATE_INFO_SHEET.getRange(lastRowOfColumnA + 1, 1).setValue('✔');
+      
+      //UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 1, 1, 1)
+    //                         UPDATE_INFO_SHEET.getLastRow(), 1, 1, 1).setValue('✔');
       replyMessage = ['ご確認いただき、ありがとうございました！'];
       break;
       
