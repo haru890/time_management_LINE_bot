@@ -34,7 +34,7 @@ function doPost(e) {
       }
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 4, 1, 1).setValue(lastRemainingTime);// 残り（分）
       UPDATE_INFO_SHEET.getRange(UPDATE_INFO_SHEET.getLastRow(), 5, 1, 1).setValue(arg2);// 備考
-      replyMessage = [`更新 ${updateTime}(分)\n残り   ${lastRemainingTime}(分) になったよ！`];
+      replyMessage = [`更新   ${updateTime}(分)\n残り   ${lastRemainingTime}(分) になったよ！`];
       break;
     
     case 'リンク':
