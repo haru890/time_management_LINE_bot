@@ -43,9 +43,11 @@ function doPost(e) {
       
     case '承認':
       // 「承認行」の最終行に「✔」を記入する
+      const lastRow = UPDATE_INFO_SHEET.getLastRow();
       const lastRowOfColumnA = UPDATE_INFO_SHEET.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
       UPDATE_INFO_SHEET.getRange(lastRowOfColumnA + 1, 1).setValue('✔');
-      replyMessage = ['承認ありがとう！'];
+      const unapprovedNum = lastRow - lastRowOfColumnA - 1
+      replyMessage = [`承認ありがとう！\n未承認の数：${unapprovedNum}`];
       break;
       
     default:
