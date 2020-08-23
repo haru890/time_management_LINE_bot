@@ -37,7 +37,7 @@ function doPost(e) {
       replyMessage = [`更新   ${updateTime}(分)\n残り   ${lastRemainingTime}(分) になったよ！`];
       break;
     
-    case '確認':
+    case '詳細':
       replyMessage = ['詳細を確認するときは、リンクをクリックしてね！\nhttps://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0'];
       break;
       
@@ -51,7 +51,7 @@ function doPost(e) {
       break;
       
     case '使い方':
-      replyMessage = ['こんな風に入力してみてね！\n\n残り時間を確認するときは\n残り時間\n\n残り時間を更新するときは\n更新 更新時間 備考\n例）更新 -60 面談\n例）更新 +300 契約更新\n\n詳細を確認するときは\n確認\n\n承認するときは\n承認'];
+      replyMessage = ['こんな風に入力してみてね！\n\n残り時間を確認するときは\n残り時間\n\n残り時間を更新するときは\n更新 更新時間 備考\n例）更新 -60 面談\n例）更新 +300 契約更新\n\n詳細を確認するときは\n詳細\n\n承認するときは\n承認'];
       break;
       
     default:
