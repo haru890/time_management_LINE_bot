@@ -45,9 +45,13 @@ function doPost(e) {
       // 「承認行」の最終行に「✔」を記入する
       const lastRow = UPDATE_INFO_SHEET.getLastRow();
       const lastRowOfColumnA = UPDATE_INFO_SHEET.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
-      UPDATE_INFO_SHEET.getRange(lastRowOfColumnA + 1, 1).setValue('✔');
       const unapprovedNum = lastRow - lastRowOfColumnA - 1
-      replyMessage = [`承認ありがとう！\n未承認の数：${unapprovedNum}`];
+      if (unapprovedNum >= 0) {
+        UPDATE_INFO_SHEET.getRange(lastRowOfColumnA + 1, 1).setValue('✔');
+        replyMessage = [`承認ありがとう！\n未承認の数：${unapprovedNum}`];
+      } else { 
+        replyMessage = ['すべて承認済みだよ！\n\n詳細を確認するときは、リンクをクリックしてね！\nhttps://docs.google.com/spreadsheets/d/1bnTEdDi9M-hj-WLQaTd7iaQ7OdFgjBWdH09pJ0TvzWQ/edit#gid=0'];
+      }
       break;
       
     case '使い方':
